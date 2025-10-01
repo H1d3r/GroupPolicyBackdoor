@@ -33,7 +33,7 @@ class GPOUnlinker():
             logger.warning(f"[*] Removing link on '{ou_dn}'")
             try:
                 if self.remove_link(ou_dn) is True:
-                    logger.warning(f"{bcolors.OKGREEN}[+] Successfully deleted link from '{ou_dn}'")
+                    logger.warning(f"{bcolors.OKGREEN}[+] Successfully deleted link from '{ou_dn}'{bcolors.ENDC}")
                 else:
                     logger.error(f"{bcolors.FAIL}[!] Link for GPO {self.gpo_guid} not found on container {ou_dn}{bcolors.ENDC}")
             except Exception as e:
@@ -43,6 +43,9 @@ class GPOUnlinker():
 
     def remove_link(self, ou_dn):
         current_gplink = get_entry_attribute(self.ldap_session, ou_dn, "gPLink")
+        if current_gplink == []:
+            logger.warning(f"[!] No existing gpLink for OU.")
+            return False
         logger.info(f"[INFO] Current gPLink is {current_gplink}")
         gplink_pattern = r'\[(.*?;[0-3])\]'
         current_links = re.findall(gplink_pattern, current_gplink)

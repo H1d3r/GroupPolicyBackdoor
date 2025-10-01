@@ -32,7 +32,7 @@ class GPOLinker():
             logger.warning(f"[*] Creating link for '{ou_dn}'")
             try:
                 self.create_link(ou_dn)
-                logger.warning(f"{bcolors.OKGREEN}[+] Successfully created link on '{ou_dn}'")
+                logger.warning(f"{bcolors.OKGREEN}[+] Successfully created link on '{ou_dn}'{bcolors.ENDC}")
             except Exception as e:
                 logger.error(f"{bcolors.FAIL}[!] Link creation failed for {ou_dn}{bcolors.ENDC}", exc_info=True)
                 continue
