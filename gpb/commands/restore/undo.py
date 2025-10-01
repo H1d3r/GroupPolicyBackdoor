@@ -176,7 +176,7 @@ class GPOUndo():
         try:
             # To undo the value change of an LDAP entry, replace new value by old value. If there was no old value, then unset the attribute
             original_value = get_entry_attribute(self.ldap_session, action['item'], action['attribute'])
-            if action['old_value'] != '[]':
+            if action['old_value'] != '[]' and action['old_value'] != []:
                 modify_attribute(self.ldap_session, action['item'], action['attribute'], action['old_value'])
                 clean_save_action(self.state_folder, "ldap_modify_attribute", action['item'], action['attribute'], old_value=original_value, new_value=action['old_value'])
             else:

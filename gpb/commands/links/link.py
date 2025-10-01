@@ -40,24 +40,28 @@ class GPOLinker():
 
     def create_link(self, ou_dn):
         current_gplink = get_entry_attribute(self.ldap_session, ou_dn, "gPLink")
-        logger.info(f"[INFO] Current gPLink is {current_gplink}")
-        gplink_pattern = r'\[(.*?;[0-3])\]'
         link_exists = False
-        current_links = re.findall(gplink_pattern, current_gplink)
-        for i, current_link in enumerate(current_links):
-            if self.gpo_dn.lower() in current_link.lower():
-                link_exists = True
-                logger.warning(f"[*] Link for GPO {self.gpo_guid} already exists on container {ou_dn}")
-                link_options = int(current_link[-1])
+        if current_gplink == []:
+            logger.info(f"[*] No existing gpLink for OU. Creating the attribute")
+            current_links = []
+        else:
+            logger.info(f"[INFO] Current gPLink exists and is {current_gplink}")
+            gplink_pattern = r'\[(.*?;[0-3])\]'
+            current_links = re.findall(gplink_pattern, current_gplink)
+            for i, current_link in enumerate(current_links):
+                if self.gpo_dn.lower() in current_link.lower():
+                    link_exists = True
+                    logger.warning(f"[*] Link for GPO {self.gpo_guid} already exists on container {ou_dn}")
+                    link_options = int(current_link[-1])
 
-                if link_options == LinkOptions.DISABLED.value or link_options == LinkOptions.DISABLED_ENFORCED.value:
-                    confirmation = typer.confirm("[?] Link is currently disabled. Do you want to enable it ?")
-                    if not confirmation:
+                    if link_options == LinkOptions.DISABLED.value or link_options == LinkOptions.DISABLED_ENFORCED.value:
+                        confirmation = typer.confirm("[?] Link is currently disabled. Do you want to enable it ?")
+                        if not confirmation:
+                            return
+                        current_links[i] = current_links[i][:-1] + str(LinkOptions.NORMAL.value) if link_options == LinkOptions.DISABLED.value \
+                                        else current_links[i][:-1] + str(LinkOptions.ENFORCED.value)
+                    else:
                         return
-                    current_links[i] = current_links[i][:-1] + str(LinkOptions.NORMAL.value) if link_options == LinkOptions.DISABLED.value \
-                                       else current_links[i][:-1] + str(LinkOptions.ENFORCED.value)
-                else:
-                    return
 
         if link_exists is False:
             current_links.append(f"LDAP://cn={{{self.gpo_guid}}},cn=Policies,cn=System,{self.domain_dn};{LinkOptions.NORMAL.value}")
