@@ -54,7 +54,7 @@ class GPOCreator:
         try:
             self.domain_sid = get_entry_attribute(self.ldap_session, self.domain_dn, 'objectSid')
             logger.info(f"[INFO] Retrieved domain SID '{self.domain_sid}'")
-            self.root_domain_dn = self.ldap_session.server.info.other['rootDomainNamingContext'][3]
+            self.root_domain_dn = self.ldap_session.server.info.other['rootDomainNamingContext'][0]
             if self.root_domain_dn == self.domain_dn:
                 self.root_domain_sid = self.domain_sid
             else:
