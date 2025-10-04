@@ -84,7 +84,7 @@ class GPOCreator:
             "cn": f"{{{self.gpo_guid}}}",
             "displayName": self.display_name,
             "flags": 0,
-            "gPCFileSysPath": f"\\\\{self.dc}\\SysVol\\{self.domain}\\Policies\\{{{self.gpo_guid}}}",
+            "gPCFileSysPath": f"\\\\{self.domain}\\SysVol\\{self.domain}\\Policies\\{{{self.gpo_guid}}}",
             "gPCFunctionalityVersion": 2,
             "name": f"{{{self.gpo_guid}}}",
             "versionNumber": 0,
