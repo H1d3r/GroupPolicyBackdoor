@@ -32,13 +32,14 @@ from config                             import bcolors, logger
 class GPOCreator:
 
     def __init__(self,
-                domain: str,
-                dc: str,
+                domain,
+                dc,
+                root_domain_sid,
                 ldap_session,
                 smb_session_lowlevel,
-                display_name: str,
+                display_name,
                 gpo_guid,
-                state_folder: str) -> None:
+                state_folder) -> None:
 
         self.domain = domain
         self.domain_dn = ",".join("DC={}".format(d) for d in domain.split("."))
@@ -50,25 +51,24 @@ class GPOCreator:
         self.smb_connection = smb_session_lowlevel[0]
         self.smb_session = smb_session_lowlevel[1]
         self.state_folder = state_folder
-        
-        try:
-            self.domain_sid = get_entry_attribute(self.ldap_session, self.domain_dn, 'objectSid')
-            logger.info(f"[INFO] Retrieved domain SID '{self.domain_sid}'")
+
+        self.domain_sid = get_entry_attribute(self.ldap_session, self.domain_dn, 'objectSid')
+        logger.info(f"[INFO] Retrieved domain SID '{self.domain_sid}'")
+        if root_domain_sid is not None:
+            logger.info("[INFO] Root domain SID specified")
+            self.root_domain_sid = root_domain_sid
+        else:
+            logger.info("[INFO] Root domain SID not specified")
             self.root_domain_dn = self.ldap_session.server.info.other['rootDomainNamingContext'][0]
             if self.root_domain_dn == self.domain_dn:
+                logger.info("[INFO] We are in the forest's root domain, so root SID is current domain SID")
                 self.root_domain_sid = self.domain_sid
             else:
-                self.root_domain_sid = get_entry_attribute(self.ldap_session, self.root_domain_dn, 'objectSid')
-            logger.info(f"[INFO] Retrieved forest root domain SID '{self.root_domain_sid}'")
-        except Exception as e:
-            logger.error(f"{bcolors.FAIL}[-] Could not retrieve the domain SID or the forest root domain SID.{bcolors.ENDC}")
-            logger.debug("[DEBUG] Stacktrace:", exc_info=True)
-            self.domain_sid = None
-            self.root_domain_sid = None
-            proceed = confirm("GPO creation can proceed, although the GPT folder permissions will not be exactly as expected by Windows. The only consequence is that a popup might appear if an administrator clicks on the created GPO in the Group Policy Management Console. Proceed ?")
-            if not proceed:
-                exit(0)
-
+                logger.warning(f"{bcolors.BOLD}[*] We are not in the context of the forest root domain, and no root domain SID provided in GPO creation command{bcolors.ENDC}")
+                proceed = confirm("[?] GPO creation can proceed without issues, although the GPT folder permissions will not be exactly as the ones of legitimate GPOs (not ideal for opsec considerations). You can either proceed, or re-launch the command with the '--root-domain-sid' flag. Proceed?")
+                if not proceed:
+                    exit(0)
+                self.root_domain_sid = None
 
     def run(self) -> None:
         logger.warning(f"\n{bcolors.OKCYAN}[#] Group Policy Container creation{bcolors.ENDC}")
@@ -117,7 +117,7 @@ class GPOCreator:
             tree = TreeConnect(self.smb_session, share)
             tree.connect()
 
-            if self.root_domain_sid is not None:
+            if self.root_domain_sid is not None and self.domain_sid is not None:
                 # CREATOR_OWNER - Full control - Subfolders and files only
                 creator_owner_sid = SIDPacket()
                 creator_owner_sid.from_string("S-1-3-0")

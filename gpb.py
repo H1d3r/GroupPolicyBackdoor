@@ -51,6 +51,7 @@ def create(
     domain: Annotated[str, typer.Option("--domain", "-d", help="The domain FQDN")],
     display_name: Annotated[str, typer.Option("--display-name", "-n", help="The display name of the created GPO")],
     dc: Annotated[str, typer.Option("--dc", help="The target domain controller (IP or FQDN). Any writable DC is suitable, although the PDC is preferred for GPO operations. If omitted, defaults to the domain FQDN")] = None,
+    root_domain_sid: Annotated[str, typer.Option("--root-domain-sid", "-s", help="The SID of the forest's root domain. This is used if you are not in the forest's root domain, to set SYSVOL permissions. GPO creation will work without issues if you do not provide it, although SYSVOL permissions might stand out compared to legitimate GPOs.")] = None,
     username: Annotated[str, typer.Option("--username", "-u", help="The username")] = None,
     password: Annotated[str, typer.Option("--password", "-p", help="The password")] = None,
     hash: Annotated[str, typer.Option("--hash", "-H", help="The NT hash for the domain account (e.g. A4F49C406510BDCAB6824EE7C30FD852)")] = None,
@@ -78,10 +79,11 @@ def create(
         gpo_guid = str(uuid.uuid4()).upper()
         logger.info(f"[INFO] GPO GUID will be {gpo_guid}")
         state_folder = clean_create_folder("create", gpo_guid)
-        logger.warning(f"[*] State folder is {bcolors.BOLD}{state_folder}{bcolors.ENDC}")
+        logger.warning(f"[*] State folder is {bcolors.BOLD}{state_folder}{bcolors.ENDC}\n")
 
         gpo_creator = GPOCreator(domain,
                         dc,
+                        root_domain_sid,
                         ldap_session,
                         smb_session_lowlevel,
                         display_name,
@@ -131,7 +133,7 @@ def delete(
             return
         logger.info(f"[INFO] GPO has GUID {gpo_guid} and exists")
         state_folder = clean_create_folder("delete", gpo_guid)
-        logger.warning(f"[*] State folder is {bcolors.BOLD}{state_folder}{bcolors.ENDC}")
+        logger.warning(f"[*] State folder is {bcolors.BOLD}{state_folder}{bcolors.ENDC}\n")
 
         gpo_deleter = GPODeleter(domain,
                                 dc,
@@ -185,7 +187,7 @@ def inject(
             return
         logger.info(f"[INFO] GPO has GUID {gpo_guid} and exists")
         state_folder = clean_create_folder("inject", gpo_guid)
-        logger.warning(f"[*] State folder is {bcolors.BOLD}{state_folder}{bcolors.ENDC}")
+        logger.warning(f"[*] State folder is {bcolors.BOLD}{state_folder}{bcolors.ENDC}\n")
 
 
         if len(modules) > 0:
@@ -238,7 +240,7 @@ def clean(
             return
         logger.info(f"[INFO] GPO has GUID {gpo_guid} and exists")
         state_folder = clean_create_folder("clean", gpo_guid)
-        logger.warning(f"[*] State folder is {bcolors.BOLD}{state_folder}{bcolors.ENDC}")
+        logger.warning(f"[*] State folder is {bcolors.BOLD}{state_folder}{bcolors.ENDC}\n")
 
         gpo_cleaner = GPOCleaner(domain,
                                 dc,
@@ -290,7 +292,7 @@ def link(
             return
         logger.info(f"[INFO] GPO has GUID {gpo_guid} and exists")
         state_folder = clean_create_folder("link", gpo_guid)
-        logger.warning(f"[*] State folder is {bcolors.BOLD}{state_folder}{bcolors.ENDC}")
+        logger.warning(f"[*] State folder is {bcolors.BOLD}{state_folder}{bcolors.ENDC}\n")
 
         gpo_linker = GPOLinker(domain,
                             dc,
@@ -342,7 +344,7 @@ def unlink(
             return
         logger.info(f"[INFO] GPO has GUID {gpo_guid} and exists")
         state_folder = clean_create_folder("unlink", gpo_guid)
-        logger.warning(f"[*] State folder is {bcolors.BOLD}{state_folder}{bcolors.ENDC}")
+        logger.warning(f"[*] State folder is {bcolors.BOLD}{state_folder}{bcolors.ENDC}\n")
 
         gpo_unlinker = GPOUnlinker(domain,
                                 dc,
@@ -401,7 +403,7 @@ def configure(
             return
         logger.info(f"[INFO] GPO has GUID {gpo_guid} and exists")
         state_folder = clean_create_folder("unlink", gpo_guid)
-        logger.warning(f"[*] State folder is {bcolors.BOLD}{state_folder}{bcolors.ENDC}")
+        logger.warning(f"[*] State folder is {bcolors.BOLD}{state_folder}{bcolors.ENDC}\n")
 
         gpo_linkconfigure = GPOLinkConfigure(domain,
                             dc,
@@ -541,7 +543,7 @@ def undo(
         initialize_smb_connection(dc, username, password, kerberos)
         logger.info(f"[INFO] Target GPO GUID {gpo_guid}")
         state_folder = clean_create_folder("undo", gpo_guid)
-        logger.warning(f"[*] State folder is {bcolors.BOLD}{state_folder}{bcolors.ENDC}")
+        logger.warning(f"[*] State folder is {bcolors.BOLD}{state_folder}{bcolors.ENDC}\n")
       
 
         gpo_undo = GPOUndo(domain,
