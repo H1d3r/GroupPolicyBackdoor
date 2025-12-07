@@ -4,7 +4,7 @@ import json
 from datetime import datetime
 
 def clean_create_folder(command, gpo_guid):
-    state_folder = datetime.now().strftime("%Y_%m_%d_%H%M%S")
+    state_folder = datetime.now().strftime("%Y_%m_%d_%H%M%S_%f")
     os.makedirs("state_folders", exist_ok=True)
     os.makedirs(os.path.join("state_folders", state_folder))
     os.makedirs(os.path.join("state_folders", state_folder, "revert"))
