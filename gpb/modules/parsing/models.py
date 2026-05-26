@@ -86,7 +86,7 @@ class ScheduledTasksOptions(BaseModel):
     description: str = Field(default="")
 
 class FilesOptions(BaseModel):
-    action: Literal["create", "delete"]
+    action: Literal["create", "replace", "delete"]
     source_file: str = Field(default=None)
     destination_file: str
     hidden: bool = Field(default=False)
