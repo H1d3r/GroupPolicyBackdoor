@@ -38,6 +38,8 @@ class Files():
         if self.options.action == "create":
             file = self.create_files_generate_xml()
             self.create_files_generate_reverse_file()
+        elif self.options.action == "replace":
+            file = self.replace_files_generate_xml()
         elif self.options.action == "delete":
             file = self.delete_files_generate_xml()
         else:
@@ -71,7 +73,30 @@ class Files():
         generate_filters(file, self.filters)
 
         return file
-    
+
+    def replace_files_generate_xml(self):
+        file = etree.Element("File", attrib={
+            "clsid": "{50BE44C8-567A-4ed1-B1D0-9234FE1F38AF}",
+            "name": self.options.name,
+            "status": self.options.name,
+            "image": "0",
+            "changed": (datetime.now() - timedelta(days=random.randint(10, 45))).strftime("%Y-%m-%d %H:%M:%S"),
+            "uid": f"{{{self.identifier}}}",
+            "bypassErrors": "1"
+        })
+
+        etree.SubElement(file, "Properties", attrib={
+            "action": "R",
+            "fromPath": self.options.source_file,
+            "targetPath": self.options.destination_file,
+            "readOnly": "0",
+            "archive": "0",
+            "hidden": "1" if self.options.hidden else "0",
+        })
+
+        generate_filters(file, self.filters)
+
+        return file
 
     def delete_files_generate_xml(self):
         file = etree.Element("File", attrib={
