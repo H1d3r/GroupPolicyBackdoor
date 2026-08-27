@@ -1,0 +1,31 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "grouppolicybackdoor"
+version = "0.1.0"
+description = "A python utility for Group Policy Objects (GPOs) manipulation and exploitation."
+readme = "README.md"
+requires-python = ">=3.8"
+authors = [
+    { name = "Synacktiv" }
+]
+keywords = ["gpo", "active-directory", "pentest", "security", "gpb"]
+dependencies = [
+    "ldap3-bleeding-edge>=2.10.1.1337",
+    "smbprotocol[kerberos]",
+    "typer",
+    "pydantic",
+    "lxml",
+    "chardet",
+]
+
+[project.scripts]
+gpb = "gpb.main:app"
+
+[tool.setuptools]
+py-modules = ["config", "gpb"]
+
+[tool.setuptools.packages.find]
+where = ["."]
