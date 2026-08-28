@@ -4,3 +4,4 @@ typer
 pydantic
 lxml
 chardet
+gpblib @ git+https://github.com/synacktiv/gpblib@master#egg=gpblib

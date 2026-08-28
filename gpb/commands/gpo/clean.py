@@ -6,13 +6,13 @@ import smbclient
 import traceback
 
 from lxml                               import etree
-
+from gpblib.modules_configs             import MODULES_CONFIG
 from gpb.protocols.smb                  import delete_file, write_file_binary
 from gpb.protocols.ldap                 import get_entry_attribute, modify_attribute
 from gpb.utils.encodings                import get_xml_declared_encoding
 from gpb.utils.clean                    import clean_save_action
 
-from config                             import logger, bcolors, MODULES_CONFIG
+from config                             import logger, bcolors
 
 class GPOCleaner():
     

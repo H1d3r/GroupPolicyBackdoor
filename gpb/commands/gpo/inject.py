@@ -5,14 +5,14 @@ import smbclient
 
 from lxml                               import etree
 from smbprotocol.exceptions             import SMBOSError
-
-from gpb.modules.utils.dispatch         import dispatch
+from gpblib.modules_configs             import MODULES_CONFIG
+from gpb.utils.dispatch                 import dispatch
 from gpb.protocols.ldap                 import get_entry_attribute, modify_attribute
 from gpb.protocols.smb                  import write_file_binary
 from gpb.utils.encodings                import get_xml_declared_encoding
 from gpb.utils.clean                    import clean_save_action
 
-from config                             import bcolors, logger, MODULES_CONFIG
+from config                             import bcolors, logger
 
 class GPOInjecter():
     def __init__(self,

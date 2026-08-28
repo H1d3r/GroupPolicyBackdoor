@@ -18,7 +18,7 @@ from gpb.commands.enum.gpo_list    import GPOLister
 from gpb.commands.enum.gpo_details import GPODetails
 from gpb.commands.restore.undo     import GPOUndo
 from gpb.commands.restore.backup   import GPOBackup
-from gpb.modules.parsing.validate  import validate_modules
+from gpblib.parsing.validate       import validate_modules
 
 from gpb.protocols.ldap            import get_ldap_session
 from gpb.protocols.smb             import initialize_smb_connection

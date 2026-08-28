@@ -1,9 +1,10 @@
 import smbclient
 
-from smbprotocol.exceptions     import SMBOSError
-from gpb.utils.clean            import clean_save_module
+from gpblib.modules_configs             import MODULES_CONFIG
+from smbprotocol.exceptions             import SMBOSError
+from gpb.utils.clean                    import clean_save_module
 
-from config                     import logger, MODULES_CONFIG
+from config                             import logger
 
         
 def dispatch(modules, state_folder, gpo_sysvol_path):
